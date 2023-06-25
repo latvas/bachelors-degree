@@ -54,7 +54,7 @@ def create_csv_files(processes: list()):
     csv_filenames = list(
         map(lambda x: ('csv/'+str(x.pid)+'_'+str(x.name())+'.csv', x), processes))
     header_row = tuple(
-        "pid time cpu_user cpu_system total_cpu child_cpu_user child_cpu_system total_child_cpu cpu_percent thr_user_time thr_system_time rss_memory pss_memory memory_percent".split())
+        "pid time cpu_user cpu_system total_cpu child_cpu_user child_cpu_system total_child_cpu cpu_percent thr_user_time thr_system_time rss_memory pss_memory memory_percent write read".split())
 
     csv_files = list()
     for filename, process in csv_filenames:
@@ -90,6 +90,8 @@ def get_process_info(process: psutil.Process):
     mem_info = process.memory_full_info()
     mem_percent = process.memory_percent()
     thr_user_time, thr_system_time = get_threads_cpu_time(process)
+    num_read_bytes = process.io_counters().read_bytes
+    num_write_bytes = process.io_counters().write_bytes
     data.append(process.pid)
     data.append(time.time())
     data.append(cpu_times.user)
@@ -104,6 +106,8 @@ def get_process_info(process: psutil.Process):
     data.append(mem_info.rss)
     data.append(mem_info.pss)
     data.append(mem_percent)
+    data.append(num_write_bytes)
+    data.append(num_read_bytes)
     return data
 
 
